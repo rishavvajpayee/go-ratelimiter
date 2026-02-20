@@ -1,0 +1,16 @@
+Problem :
+Implement a per-user API rate limiter.
+Operations
+* allowRequest(userID) -> bool
+* getRemainingQuota(userID)
+Rules
+* Max N requests per T seconds
+* Sliding window (not fixed window)
+Concurrency Traps
+* Time-based eviction while requests are arriving
+* Per-user isolation vs global lock
+* Memory growth control
+What this tests
+* Concurrent data structures
+* Lock sharding
+* Time-sensitive correctness;

@@ -68,7 +68,7 @@ func (rl *RateLimiter) StartCleanUp(interval time.Duration, idleDuration time.Du
 				s.mu.Lock()
 				for userID, ul := range s.users {
 					ul.mu.Lock()
-					cutOff := time.Now().Add(-WINDOW).UnixNano()
+					cutOff := now.Add(-WINDOW).UnixNano()
 					for len(ul.queue) > 0 && ul.queue[0] < cutOff {
 						ul.queue.Dequeue()
 					}
@@ -108,8 +108,8 @@ func (rl *RateLimiter) AllowRequest(userID int64) bool {
 	cutOff := time.Now().Add(-T).UnixNano()
 
 	ul := rl.GetUserLimiter(userID)
-	ul.lastSeen = time.Now()
 	ul.mu.Lock()
+	ul.lastSeen = time.Now()
 	defer ul.mu.Unlock()
 
 	for len(ul.queue) > 0 && ul.queue[0] < cutOff {

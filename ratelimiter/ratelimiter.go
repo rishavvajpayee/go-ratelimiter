@@ -12,10 +12,6 @@ const WINDOW = 6 * time.Minute
 
 type Queue []int64
 
-func (q *Queue) getLen() int64 {
-	return int64(len(*q))
-}
-
 func (q *Queue) Enqueue(value int64) {
 	*q = append(*q, value)
 }

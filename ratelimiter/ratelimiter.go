@@ -12,6 +12,10 @@ const WINDOW = 6 * time.Minute
 
 type Queue []int64
 
+func (q *Queue) getLen() int64 {
+	return int64(len(*q))
+}
+
 func (q *Queue) Enqueue(value int64) {
 	*q = append(*q, value)
 }
@@ -85,6 +89,32 @@ func (rl *RateLimiter) StartCleanUp(interval time.Duration, idleDuration time.Du
 			}
 		}
 	}()
+}
+
+func (rl *RateLimiter) GetRemainingQuota(userID int64) int {
+	now := time.Now()
+	cutOff := now.Add(-T).UnixNano()
+
+	s := rl.GetShard(userID)
+
+	s.mu.Lock()
+	ul, exists := s.users[userID]
+	s.mu.Unlock()
+	if !exists {
+		return N
+	}
+
+	ul.mu.Lock()
+	defer ul.mu.Unlock()
+	for len(ul.queue) > 0 && ul.queue[0] < cutOff {
+		ul.queue.Dequeue()
+	}
+
+	if len(ul.queue) >= N {
+		return 0
+	}
+
+	return N - len(ul.queue)
 }
 
 func (rl *RateLimiter) GetUserLimiter(userID int64) *UserLimiter {

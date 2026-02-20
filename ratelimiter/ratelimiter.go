@@ -29,7 +29,7 @@ func (q *Queue) Dequeue() (int64, error) {
 const ShardCount = 64
 
 type Shard struct {
-	mu    sync.Mutex
+	mu    sync.RWMutex
 	users map[int64]*UserLimiter
 }
 
